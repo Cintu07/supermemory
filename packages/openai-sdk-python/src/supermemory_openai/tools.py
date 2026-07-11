@@ -1,7 +1,7 @@
 """Supermemory tools for OpenAI function calling."""
 
 import json
-from typing import Dict, List, Optional, TypedDict, Union
+from typing import Dict, List, Optional, TypedDict
 
 import supermemory
 from openai.types.chat import (
@@ -10,8 +10,7 @@ from openai.types.chat import (
     ChatCompletionToolMessageParam,
 )
 from supermemory.types import (
-    MemoryAddResponse,
-    MemoryGetResponse,
+    AddResponse,
     SearchExecuteResponse,
 )
 from supermemory.types.search_execute_response import Result
@@ -34,8 +33,10 @@ class SupermemoryToolsConfig(TypedDict, total=False):
     project_id: Optional[str]
 
 
-# Type aliases using inferred types from supermemory package
-MemoryObject = Union[MemoryGetResponse, MemoryAddResponse]
+# Type aliases using inferred types from supermemory package.
+# supermemory 3.x dropped the separate get/add response types and returns a
+# single AddResponse from the add endpoint.
+MemoryObject = AddResponse
 
 
 class MemorySearchResult(TypedDict, total=False):
@@ -51,7 +52,7 @@ class MemoryAddResult(TypedDict, total=False):
     """Result type for memory add operations."""
 
     success: bool
-    memory: Optional[MemoryAddResponse]
+    memory: Optional[AddResponse]
     error: Optional[str]
 
 
@@ -226,7 +227,7 @@ class SupermemoryTools:
                 "container_tags": self.container_tags,
             }
 
-            response: MemoryAddResponse = await self.client.memories.add(**add_params)
+            response: AddResponse = await self.client.add(**add_params)
 
             return MemoryAddResult(
                 success=True,
